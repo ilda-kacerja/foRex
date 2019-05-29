@@ -4,7 +4,7 @@
 #' @importFrom httr GET content
 #' @importFrom logger log_info log_debug log_trace
 #' @examples
-#' eurusd(54)
+#' eurusd()
 
 
 eurusd <- function(){
