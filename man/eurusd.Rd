@@ -13,5 +13,5 @@ number
 Exchange rate for the current day
 }
 \examples{
-eurusd(54)
+eurusd()
 }
