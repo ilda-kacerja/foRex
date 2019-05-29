@@ -5,7 +5,7 @@
 #' @importFrom httr GET content
 #' @importFrom logger log_info log_debug log_trace
 #' @examples
-#' convert_usd_eur(54)
+#' convert_usd_to_eur(54)
 
 
 convert_usd_to_eur <- function(usd){
