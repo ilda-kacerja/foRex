@@ -8,5 +8,5 @@
 #' eur(10.784765482734823)
 
 eur <- function(x) {
-  dollar(x, prefix = '€', suffix = '', big.mark = ",")
+  dollar(x, prefix = '\200', suffix = '', big.mark = ",")
 }
