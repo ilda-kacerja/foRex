@@ -1,0 +1,82 @@
+---
+title: "Demo of `eur` and `eurusds` Functions"
+author: Ilda Kacerja
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{my-vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+Load necessary libraries. 
+
+```{r setup, message=FALSE, warning=FALSE}
+library(foRex)
+library(binancer)
+library(data.table)
+library(ggplot2)
+```
+
+Use function `binancer::binance_klines` to get the data for bitcoin prices in the last 45 days. 
+
+```{r}
+# Getting data
+coin_prices <- binance_klines('BTCUSDT', interval = '1d', limit = 45) 
+coin_prices[, date := as.Date(close_time)]
+coin_prices <- coin_prices[, .(btcusd_price = close, date, volume)]
+head(coin_prices)
+dim(coin_prices)
+# Set key for further merge
+setkey(coin_prices, date)
+```
+
+The dataset has last 45 days of bitcoin prices in $ and volume.
+
+
+Use function `foRex::eurusds` to get exchange rates $ to €, for the range of dates we are interested on (in this case the last 45 days). 
+
+```{r}
+earliest_date <- min(coin_prices$date)
+latest_date <- max(coin_prices$date)
+# get exchange rates
+exchange_rates <- eurusds(earliest_date, latest_date)
+head(exchange_rates)
+dim(exchange_rates)
+# Set key for further merge
+setkey(exchange_rates, date)
+```
+
+Exchange rates are not available for weekends and holidays, this explains the dataset with only 29 exchange rates instead of 45. 
+The missing values will be imputed with the latest exchange rates available. 
+
+```{r}
+coin_prices <- exchange_rates[coin_prices, roll = TRUE]
+head(coin_prices)
+```
+
+The overall value of the bitcoin (in EUR) is calculated like below.
+
+```{r}
+coin_prices <- coin_prices[, value_eur := usdeur*btcusd_price*volume]
+head(coin_prices)
+```
+
+Below you can see the overall value of bitcoin in EUR for the past 45 days.
+
+Use function `foRex::eur` to format the y-axis values.
+
+```{r, fig.align='center', fig.width=7}
+ggplot(coin_prices, aes(date, value_eur)) + geom_line() + 
+  theme_bw() + 
+  scale_y_continuous(labels = eur) + labs(title = "BTC Overall Value (€)",
+                                          subtitle = "Past 45 days",
+                                          x = " ", 
+                                          y = "")
+```
