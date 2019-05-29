@@ -16,5 +16,5 @@ number (the amount in EUR)
 Exchange rate for a certain amount in the latest day
 }
 \examples{
-convert_usd_eur(54)
+convert_usd_to_eur(54)
 }
